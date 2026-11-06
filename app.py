@@ -10,7 +10,7 @@ TELEGRAM_ID = os.environ.get('TELEGRAM_ID')
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
-# Faqat tayyor buketlar (1 ta buket = 10 ta gul) tizimidagi yakuniy dizayn
+# Avtomatik yetkazib berishni hisoblaydigan JavaScript o'rnatilgan dizayn
 SAYT_DIZAYNI = """
 <!DOCTYPE html>
 <html lang="uz">
@@ -43,16 +43,22 @@ SAYT_DIZAYNI = """
         button { width: 100%; background: #ff69b4; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
         button:hover { background: #db7093; }
         .muvaffaqiyat { background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; font-weight: bold; }
+        
+        .shart-blok { background: #fff9fa; border: 1px dashed #ffb6c1; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 15px; color: #c71585; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌸 Gul Dunyosi 🌸</h1>
-        <div class="subtitle">Sizning shaxsiy onlayn gullar do'koningiz</div>
+        <div class="subtitle">Onlayn buyurtma va yetkazib berish</div>
         
         <div class="aloqa-blok">
             Biz bilan bog'lanish: <a href="tel:+998909180630">+998 (90) 918-06-30</a> | 
             Telegram: <a href="https://t.me" target="_blank">@Shoqqivines777</a>
+        </div>
+
+        <div class="shart-blok">
+            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa yetkazib beriladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, o'zingiz olib ketasiz.
         </div>
 
         {% if xabar %}
@@ -61,7 +67,6 @@ SAYT_DIZAYNI = """
 
         <!-- Vitrina -->
         <div class="gullar-galereya">
-            <!-- 1. Oq ayiq -->
             <div class="gul-karta">
                 <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Oq ayiq">
                 <div>
@@ -71,7 +76,6 @@ SAYT_DIZAYNI = """
                 </div>
             </div>
             
-            <!-- 2. Olovrang -->
             <div class="gul-karta">
                 <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Olovrang">
                 <div>
@@ -81,7 +85,6 @@ SAYT_DIZAYNI = """
                 </div>
             </div>
 
-            <!-- 3. Pushti -->
             <div class="gul-karta">
                 <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Pushti">
                 <div>
@@ -92,10 +95,10 @@ SAYT_DIZAYNI = """
             </div>
         </div>
 
-        <form method="POST" action="/">
+        <form method="POST" action="/" id="buyurtmaForma">
             <div class="forma-guruh">
                 <label for="ism">Ismingiz:</label>
-                <input type="text" id="ism" name="ism" placeholder="Ismingizni kiriting...">
+                <input type="text" id="ism" name="ism" placeholder="Ismingizni kiriting..." required>
             </div>
 
             <div class="forma-guruh">
@@ -109,7 +112,18 @@ SAYT_DIZAYNI = """
 
             <div class="forma-guruh">
                 <label for="soni">Nechta buket kerak?</label>
-                <input type="number" id="soni" name="soni" value="1" min="1" required>
+                <input type="number" id="soni" name="soni" value="1" min="1" onchange="tekshirBuketSoni()" required>
+            </div>
+
+            <!-- Faqat 2 ta va undan ko'p buket bo'lganda ochiladigan blok -->
+            <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
+                <label for="km">Masofa (Necha kilometr uzoqlikda joylashgansiz?):</label>
+                <input type="number" id="km" name="km" value="0" min="0" placeholder="Masalan: 5">
+                <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
+            </div>
+
+            <div class="forma-guruh" id="oziOlibKetishMatn">
+                <p style="color: #dc3545; font-size: 14px; font-weight: bold;">⚠️ 1 ta buket uchun yetkazib berish mavjud emas. Faqat o'zingiz olib ketishingiz (Samovivoz) mumkin.</p>
             </div>
 
             <div class="forma-guruh">
@@ -123,13 +137,35 @@ SAYT_DIZAYNI = """
             </div>
 
             <div class="forma-guruh">
-                <label for="izoh">Qo'shimcha istaklaringiz:</label>
-                <textarea id="izoh" name="izoh" rows="3" placeholder="Masalan: lenta rangi yoki yetkazib berish manzili..."></textarea>
+                <label for="izoh">Yetkazish manzili yoki qo'shimcha istaklar:</label>
+                <textarea id="izoh" name="izoh" rows="3" placeholder="Masalan: Uy raqami, lenta rangi va hokazo..."></textarea>
             </div>
 
             <button type="submit">🌸 Buyurtma berish 🌸</button>
         </form>
     </div>
+
+    <script>
+        function tekshirBuketSoni() {
+            var soni = document.getElementById("soni").value;
+            var yetkazishBlok = document.getElementById("yetkazishBlok");
+            var oziOlibKetishMatn = document.getElementById("oziOlibKetishMatn");
+            var kmInput = document.getElementById("km");
+            
+            if (soni >= 2) {
+                yetkazishBlok.style.display = "block";
+                oziOlibKetishMatn.style.display = "none";
+                kmInput.required = true;
+            } else {
+                yetkazishBlok.style.display = "none";
+                oziOlibKetishMatn.style.display = "block";
+                kmInput.value = 0;
+                kmInput.required = false;
+            }
+        }
+        // Sahifa yuklanganda bir marta tekshirib oladi
+        tekshirBuketSoni();
+    </script>
 </body>
 </html>
 """
@@ -141,38 +177,20 @@ def index():
         ism = request.form.get("ism", "Kiritilmagan")
         gul_turi = request.form.get("gul_turi")
         soni = int(request.form.get("soni", 1))
+        km = int(request.form.get("km", 0))
         sana = request.form.get("sana")
         telefon = request.form.get("telefon")
         izoh = request.form.get("izoh", "Yo'q")
         
-        # Aniq buket narxlari (35,000 va 80,000)
+        # Buket narxlari
         if gul_turi == "Oq Ayiq (Beleviy Mishka) Buketi":
             bitta_buket_narxi = 80000
         else:
             bitta_buket_narxi = 35000
             
-        umumiy_narx = soni * bitta_buket_narxi
-        narx_matni = f"{umumiy_narx:,} so'm"
+        gullar_narxi = soni * bitta_buket_narxi
         
-        telegram_xabari = (
-            f"🛍 **YANGI BUYURTMA KELDI!**\n\n"
-            f"👤 **Mijoz ismi:** {ism}\n"
-            f"💐 **Gul turi:** {gul_turi}\n"
-            f"🔢 **Buket soni:** {soni} ta buket (har birida 10 tadan gul)\n"
-            f"💰 **Umumiy narx:** {narx_matni}\n"
-            f"📅 **Qachonga:** {sana}\n"
-            f"📞 **Telefon:** {telefon}\n"
-            f"✍️ **Izoh:** {izoh}"
-        )
-        
-        try:
-            bot.send_message(TELEGRAM_ID, telegram_xabari, parse_mode="Markdown")
-            xabar = "Rahmat! Buyurtmangiz muvaffaqiyatli qabul qilindi va do'kon egasiga yuborildi."
-        except Exception as e:
-            xabar = f"Xatolik yuz berdi: {str(e)}"
-            
-    return render_template_string(SAYT_DIZAYNI, xabar=xabar)
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+        # Yetkazish xizmatini hisoblash (Faqat 2 ta va undan ko'p buket uchun)
+        if soni >= 2:
+            yetkazish_narxi = km * 3000
+            umumiy_narx = gullar_narxi + yetkazish_narxi
