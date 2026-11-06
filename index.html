@@ -116,7 +116,7 @@
                     <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
                 </div>
 
-                <!-- Yandex Xarita oynasi (Sergili Yuqori Darxon Beltepaga moslangan) -->
+                <!-- Yandex Xarita oynasi -->
                 <div class="map-container">
                     <iframe src="https://yandex.ru" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
                 </div>
@@ -178,3 +178,4 @@
             var gul = select.value;
             var narx = parseInt(select.options[select.selectedIndex].getAttribute("data-narx"));
             var soni = parseInt(document.getElementById("soni").value);
+            var km = parseInt(document.getElementById("km").value) || 0;
