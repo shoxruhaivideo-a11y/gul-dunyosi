@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gul Dunyosi — Onlayn do'kon</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #fff0f5; color: #4a4a4a; margin: 0; padding: 20px; }
+        .container { max-width: 600px; background: white; margin: 0 auto; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        h1 { color: #ff69b4; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #db7093; font-style: italic; margin-bottom: 25px; }
+        .aloqa-blok { text-align: center; background: #ffe4e1; padding: 10px; border-radius: 10px; margin-bottom: 25px; font-size: 14px; }
+        .aloqa-blok a { color: #db7093; text-decoration: none; font-weight: bold; }
+        
+        .gullar-galereya { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        @media (max-width: 500px) { .gullar-galereya { grid-template-columns: 1fr; } }
+        
+        .gul-karta { border: 2px solid #ffb6c1; border-radius: 15px; padding: 15px; text-align: center; background: #fffdfd; display: flex; flex-direction: column; justify-content: space-between; }
+        .gul-karta img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+        .gul-nomi { font-size: 16px; font-weight: bold; color: #db7093; margin: 10px 0 5px 0; }
+        .narx { font-size: 13px; margin: 3px 0; color: #555; }
+        .narx strong { color: #ff1493; }
+        .tarkib { font-size: 12px; color: #777; font-style: italic; }
+        
+        .forma-guruh { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #db7093; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ffb6c1; border-radius: 10px; box-sizing: border-box; font-size: 15px; background-color: #fff0f5; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #ff69b4; background-color: #fff; }
+        button { width: 100%; background: #ff69b4; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
+        button:hover { background: #db7093; }
+        
+        .shart-blok { background: #fff9fa; border: 1px dashed #ffb6c1; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 15px; color: #c71585; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 Gul Dunyosi 🌸</h1>
+        <div class="subtitle">Onlayn buyurtma va yetkazib berish</div>
+        
+        <div class="aloqa-blok">
+            Biz bilan bog'lanish: <a href="tel:+998909180630">+998 (90) 918-06-30</a> | 
+            Telegram: <a href="https://t.me" target="_blank">@Shoqqivines777</a>
+        </div>
+
+        <div class="shart-blok">
+            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi.
+        </div>
+
+        <form onsubmit="yuborTelegram(event)">
+            <div class="forma-guruh">
+                <label for="ism">Ismingiz:</label>
+                <input type="text" id="ism" placeholder="Ismingizni kiriting..." required>
+            </div>
+
+            <div class="forma-guruh">
+                <label for="gul_turi">Buket turini tanlang:</label>
+                <select id="gul_turi" onchange="tekshirBuket()">
+                    <option value="Oq Ayiq (Beleviy Mishka) Buketi" data-narx="80000">Oq Ayiq (Beleviy Mishka) — 80,000 so'm</option>
+                    <option value="Olovrang xrizantema buketi" data-narx="35000">Olovrang xrizantema — 35,000 so'm</option>
+                    <option value="Pushti xrizantema buketi" data-narx="35000">Pushti xrizantema — 35,000 so'm</option>
+                </select>
+            </div>
+
+            <div class="forma-guruh">
+                <label for="soni">Nechta buket kerak?</label>
+                <input type="number" id="soni" value="1" min="1" oninput="tekshirBuket()" required>
+            </div>
+
+            <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
+                <label for="km">Masofa (Necha kilometr uzoqlikdasiz?):</label>
+                <input type="number" id="km" value="0" min="0" placeholder="Masalan: 5">
+                <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
+            </div>
+
+            <div class="forma-guruh" id="oziOlibKetishMatn">
+                <p style="color: #dc3545; font-size: 14px; font-weight: bold;">⚠️ 1 ta buket uchun yetkazib berish mavjud emas. Faqat o'zingiz olib ketishingiz (Samovivoz) mumkin.</p>
+            </div>
+
+            <div class="forma-guruh">
+                <label for="sana">Qaysi kunga kerak?</label>
+                <input type="date" id="sana" required>
+            </div>
+
+            <div class="forma-guruh">
+                <label for="telefon">Telefon raqamingiz</label>
+                <input type="tel" id="telefon" value="+998" required>
+            </div>
+
+            <div class="forma-guruh">
+                <label for="izoh">Yetkazish manzili yoki qo'shimcha istaklar:</label>
+                <textarea id="izoh" rows="3" placeholder="Masalan: Uy raqami, lenta rangi va hokazo..."></textarea>
+            </div>
+
+            <button type="submit">🌸 Buyurtma berish 🌸</button>
+        </form>
+    </div>
+
+    <script>
+        function tekshirBuket() {
+            var s = document.getElementById("soni").value;
+            var yb = document.getElementById("yetkazishBlok");
+            var ok = document.getElementById("oziOlibKetishMatn");
+            var k = document.getElementById("km");
+            if (s >= 2) {
+                yb.style.display = "block";
+                ok.style.display = "none";
+            } else {
+                yb.style.display = "none";
+                ok.style.display = "block";
+                k.value = 0;
+            }
+        }
+
+        function yuborTelegram(e) {
+            e.preventDefault();
+            var ism = document.getElementById("ism").value;
+            var select = document.getElementById("gul_turi");
+            var gul = select.value;
+            var narx = parseInt(select.options[select.selectedIndex].getAttribute("data-narx"));
+            var soni = parseInt(document.getElementById("soni").value);
+            var km = parseInt(document.getElementById("km").value) || 0;
+            var sana = document.getElementById("sana").value;
+            var tel = document.getElementById("telefon").value;
+            var izoh = document.getElementById("izoh").value || "Yo'q";
+
+            var gullar_narxi = soni * narx;
+            var yetkazish_narxi = soni >= 2 ? km * 3000 : 0;
+            var jami = gullar_narxi + yetkazish_narxi;
+
+            var matn = `🛍 YANGI BUYURTMA!\n\n👤 Ism: ${ism}\n💐 Turi: ${gul}\n🔢 Soni: ${soni} ta buket\n🚗 Masofa: ${km} km\n🚚 Yo'l kira: ${yetkazish_narxi.toLocaleString()} so'm\n💰 JAMI: ${jami.toLocaleString()} so'm\n📅 Qachonga: ${sana}\n📞 Tel: ${tel}\n✍️ Izoh/Manzil: ${izoh}`;
+            
+            var url = "https://t.me?text=" + encodeURIComponent(matn);
+            window.open(url, '_blank');
+        }
+        tekshirBuket();
+    </script>
+</body>
+</html>
