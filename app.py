@@ -2,12 +2,15 @@ import os
 from flask import Flask, request, render_template_string
 import telebot
 
+# Render'da xavfsiz kiritilgan muhit o'zgaruvchilarini olish
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 TELEGRAM_ID = os.environ.get('TELEGRAM_ID')
 
+# Botni ishga tushirish
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
+# O'zbekistonda aniq ochiladigan rasmlar va pushti dizayn
 SAYT_DIZAYNI = """
 <!DOCTYPE html>
 <html lang="uz">
@@ -27,7 +30,7 @@ SAYT_DIZAYNI = """
         @media (max-width: 500px) { .gullar-galereya { grid-template-columns: 1fr; } }
         
         .gul-karta { border: 2px solid #ffb6c1; border-radius: 15px; padding: 15px; text-align: center; background: #fffdfd; display: flex; flex-direction: column; justify-content: space-between; }
-        .gul-karta img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+        .gul-karta img { width: 100%; height: 160px; object-fit: contain; border-radius: 10px; background-color: #ffe4e1; padding: 5px; }
         .gul-nomi { font-size: 17px; font-weight: bold; color: #db7093; margin: 10px 0 5px 0; }
         .narx { font-size: 13px; margin: 3px 0; color: #555; }
         .narx strong { color: #ff1493; }
@@ -57,7 +60,7 @@ SAYT_DIZAYNI = """
 
         <div class="gullar-galereya">
             <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Pushti xrizantema">
+                <img src="https://telegram.org" alt="Pushti xrizantema">
                 <div>
                     <div class="gul-nomi">Pushti Xrizantema</div>
                     <div class="narx">1 donasi: <strong>2 000 so'm</strong></div>
@@ -66,7 +69,7 @@ SAYT_DIZAYNI = """
             </div>
             
             <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Oppoq xrizantema">
+                <img src="https://telegram.org" alt="Oppoq xrizantema">
                 <div>
                     <div class="gul-nomi">Oppoq Xrizantema</div>
                     <div class="narx">Narxi: <strong>Belgilanmagan</strong></div>
@@ -75,7 +78,7 @@ SAYT_DIZAYNI = """
             </div>
 
             <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Olovrang xrizantema">
+                <img src="https://telegram.org" alt="Olovrang xrizantema">
                 <div>
                     <div class="gul-nomi">Olovrang Xrizantema</div>
                     <div class="narx">1 donasi: <strong>2 000 so'm</strong></div>
@@ -84,7 +87,7 @@ SAYT_DIZAYNI = """
             </div>
 
             <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Bardoviy xrizantema">
+                <img src="https://telegram.org" alt="Bardoviy xrizantema">
                 <div>
                     <div class="gul-nomi">Bardoviy Xrizantema</div>
                     <div class="narx">1 donasi: <strong>2 000 so'm</strong></div>
