@@ -10,7 +10,7 @@ TELEGRAM_ID = os.environ.get('TELEGRAM_ID')
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
-# O'zbekistonda aniq ochiladigan rasmlar va pushti dizayn
+# Faqat tayyor buketlar (1 ta buket = 10 ta gul) tizimidagi yakuniy dizayn
 SAYT_DIZAYNI = """
 <!DOCTYPE html>
 <html lang="uz">
@@ -30,10 +30,11 @@ SAYT_DIZAYNI = """
         @media (max-width: 500px) { .gullar-galereya { grid-template-columns: 1fr; } }
         
         .gul-karta { border: 2px solid #ffb6c1; border-radius: 15px; padding: 15px; text-align: center; background: #fffdfd; display: flex; flex-direction: column; justify-content: space-between; }
-        .gul-karta img { width: 100%; height: 160px; object-fit: contain; border-radius: 10px; background-color: #ffe4e1; padding: 5px; }
-        .gul-nomi { font-size: 17px; font-weight: bold; color: #db7093; margin: 10px 0 5px 0; }
+        .gul-karta img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+        .gul-nomi { font-size: 16px; font-weight: bold; color: #db7093; margin: 10px 0 5px 0; }
         .narx { font-size: 13px; margin: 3px 0; color: #555; }
         .narx strong { color: #ff1493; }
+        .tarkib { font-size: 12px; color: #777; font-style: italic; }
         
         .forma-guruh { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #db7093; }
@@ -47,7 +48,7 @@ SAYT_DIZAYNI = """
 <body>
     <div class="container">
         <h1>🌸 Gul Dunyosi 🌸</h1>
-        <div class="subtitle">Zamonaviy onlayn gullar do'koni</div>
+        <div class="subtitle">Sizning shaxsiy onlayn gullar do'koningiz</div>
         
         <div class="aloqa-blok">
             Biz bilan bog'lanish: <a href="tel:+998909180630">+998 (90) 918-06-30</a> | 
@@ -58,40 +59,35 @@ SAYT_DIZAYNI = """
             <div class="muvaffaqiyat">{{ xabar }}</div>
         {% endif %}
 
+        <!-- Vitrina -->
         <div class="gullar-galereya">
+            <!-- 1. Oq ayiq -->
             <div class="gul-karta">
-                <img src="https://telegram.org" alt="Pushti xrizantema">
+                <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Oq ayiq">
                 <div>
-                    <div class="gul-nomi">Pushti Xrizantema</div>
-                    <div class="narx">1 donasi: <strong>2 000 so'm</strong></div>
-                    <div class="narx">15 dona (Buket): <strong>30 000 so'm</strong></div>
+                    <div class="gul-nomi">Oq Ayiq (Beleviy Mishka)</div>
+                    <div class="narx">1 Buket: <strong>80 000 so'm</strong></div>
+                    <div class="tarkib">(1 ta buketda 10 dona gul)</div>
                 </div>
             </div>
             
+            <!-- 2. Olovrang -->
             <div class="gul-karta">
-                <img src="https://telegram.org" alt="Oppoq xrizantema">
-                <div>
-                    <div class="gul-nomi">Oppoq Xrizantema</div>
-                    <div class="narx">Narxi: <strong>Belgilanmagan</strong></div>
-                    <div class="narx">Aralash buket ichida</div>
-                </div>
-            </div>
-
-            <div class="gul-karta">
-                <img src="https://telegram.org" alt="Olovrang xrizantema">
+                <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Olovrang">
                 <div>
                     <div class="gul-nomi">Olovrang Xrizantema</div>
-                    <div class="narx">1 donasi: <strong>2 000 so'm</strong></div>
-                    <div class="narx">Nafis va yorqin kuz tarovati</div>
+                    <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
+                    <div class="tarkib">(1 ta buketda 10 dona gul)</div>
                 </div>
             </div>
 
+            <!-- 3. Pushti -->
             <div class="gul-karta">
-                <img src="https://telegram.org" alt="Bardoviy xrizantema">
+                <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Pushti">
                 <div>
-                    <div class="gul-nomi">Bardoviy Xrizantema</div>
-                    <div class="narx">1 donasi: <strong>2 000 so'm</strong></div>
-                    <div class="narx">To'q qizil jozibasi</div>
+                    <div class="gul-nomi">Pushti Xrizantema</div>
+                    <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
+                    <div class="tarkib">(1 ta buketda 10 dona gul)</div>
                 </div>
             </div>
         </div>
@@ -103,18 +99,17 @@ SAYT_DIZAYNI = """
             </div>
 
             <div class="forma-guruh">
-                <label for="gul_turi">Gul yoki buketni tanlang:</label>
+                <label for="gul_turi">Buket turini tanlang:</label>
                 <select id="gul_turi" name="gul_turi">
-                    <option value="Mayin pushti va pushti buket">Mayin pushti va pushti buket (30,000 so'm)</option>
-                    <option value="Olovrang (Oranjivi) xrizantema buket">Olovrang (Oranjivi) xrizantema buket</option>
-                    <option value="Bardoviy xrizantema buket">Bardoviy xrizantema buket</option>
-                    <option value="Oppoq xrizantema">Oppoq xrizantema (Narxi belgilanmagan)</option>
+                    <option value="Oq Ayiq (Beleviy Mishka) Buketi">Oq Ayiq (Beleviy Mishka) — 80,000 so'm</option>
+                    <option value="Olovrang xrizantema buketi">Olovrang xrizantema — 35,000 so'm</option>
+                    <option value="Pushti xrizantema buketi">Pushti xrizantema — 35,000 so'm</option>
                 </select>
             </div>
 
             <div class="forma-guruh">
-                <label for="soni">Nechta kerak?</label>
-                <input type="number" id="soni" name="soni" value="15" min="1" required>
+                <label for="soni">Nechta buket kerak?</label>
+                <input type="number" id="soni" name="soni" value="1" min="1" required>
             </div>
 
             <div class="forma-guruh">
@@ -128,11 +123,11 @@ SAYT_DIZAYNI = """
             </div>
 
             <div class="forma-guruh">
-                <label for="izoh">Qo'shimcha ma'lumot:</label>
-                <textarea id="izoh" name="izoh" rows="3" placeholder="Masalan: chiroyli qadoqlansin..."></textarea>
+                <label for="izoh">Qo'shimcha istaklaringiz:</label>
+                <textarea id="izoh" name="izoh" rows="3" placeholder="Masalan: lenta rangi yoki yetkazib berish manzili..."></textarea>
             </div>
 
-            <button type="submit">🌸 Telegram orqali buyurtma berish 🌸</button>
+            <button type="submit">🌸 Buyurtma berish 🌸</button>
         </form>
     </div>
 </body>
@@ -150,27 +145,29 @@ def index():
         telefon = request.form.get("telefon")
         izoh = request.form.get("izoh", "Yo'q")
         
-        if gul_turi == "Oppoq xrizantema":
-            umumiy_narx = "Hali belgilanmagan"
+        # Aniq buket narxlari (35,000 va 80,000)
+        if gul_turi == "Oq Ayiq (Beleviy Mishka) Buketi":
+            bitta_buket_narxi = 80000
         else:
-            umumiy_narx = soni * 2000
-        
-        narx_matni = f"{umumiy_narx:,} so'm" if isinstance(umumiy_narx, int) else umumiy_narx
+            bitta_buket_narxi = 35000
+            
+        umumiy_narx = soni * bitta_buket_narxi
+        narx_matni = f"{umumiy_narx:,} so'm"
         
         telegram_xabari = (
             f"🛍 **YANGI BUYURTMA KELDI!**\n\n"
             f"👤 **Mijoz ismi:** {ism}\n"
             f"💐 **Gul turi:** {gul_turi}\n"
-            f"🔢 **Soni:** {soni} ta / dona\n"
+            f"🔢 **Buket soni:** {soni} ta buket (har birida 10 tadan gul)\n"
             f"💰 **Umumiy narx:** {narx_matni}\n"
             f"📅 **Qachonga:** {sana}\n"
             f"📞 **Telefon:** {telefon}\n"
-            f"✍️ **Qo'shimcha izoh:** {izoh}"
+            f"✍️ **Izoh:** {izoh}"
         )
         
         try:
             bot.send_message(TELEGRAM_ID, telegram_xabari, parse_mode="Markdown")
-            xabar = "Muvaffaqiyatli yuborildi! Buyurtma do'kon egasiga yetkazildi."
+            xabar = "Rahmat! Buyurtmangiz muvaffaqiyatli qabul qilindi va do'kon egasiga yuborildi."
         except Exception as e:
             xabar = f"Xatolik yuz berdi: {str(e)}"
             
