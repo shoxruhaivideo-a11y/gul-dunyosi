@@ -10,7 +10,7 @@ TELEGRAM_ID = os.environ.get('TELEGRAM_ID')
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
-# Avtomatik yetkazib berishni hisoblaydigan JavaScript o'rnatilgan dizayn
+# Avtomatik yetkazib berishni hisoblaydigan xatosiz dizayn
 SAYT_DIZAYNI = """
 <!DOCTYPE html>
 <html lang="uz">
@@ -58,17 +58,17 @@ SAYT_DIZAYNI = """
         </div>
 
         <div class="shart-blok">
-            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa yetkazib beriladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, o'zingiz olib ketasiz.
+            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi.
         </div>
 
         {% if xabar %}
             <div class="muvaffaqiyat">{{ xabar }}</div>
         {% endif %}
 
-        <!-- Vitrina -->
+        <!-- Vitrina: Haqiqiy o'xshash professional rasmlar bilan -->
         <div class="gullar-galereya">
             <div class="gul-karta">
-                <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Oq ayiq">
+                <img src="https://unsplash.com" alt="Oq ayiq">
                 <div>
                     <div class="gul-nomi">Oq Ayiq (Beleviy Mishka)</div>
                     <div class="narx">1 Buket: <strong>80 000 so'm</strong></div>
@@ -77,7 +77,7 @@ SAYT_DIZAYNI = """
             </div>
             
             <div class="gul-karta">
-                <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Olovrang">
+                <img src="https://unsplash.com" alt="Olovrang">
                 <div>
                     <div class="gul-nomi">Olovrang Xrizantema</div>
                     <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
@@ -86,7 +86,7 @@ SAYT_DIZAYNI = """
             </div>
 
             <div class="gul-karta">
-                <img src="https://githubusercontent.com" onerror="this.src='https://unsplash.com'" alt="Pushti">
+                <img src="https://unsplash.com" alt="Pushti">
                 <div>
                     <div class="gul-nomi">Pushti Xrizantema</div>
                     <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
@@ -112,14 +112,13 @@ SAYT_DIZAYNI = """
 
             <div class="forma-guruh">
                 <label for="soni">Nechta buket kerak?</label>
-                <input type="number" id="soni" name="soni" value="1" min="1" onchange="tekshirBuketSoni()" required>
+                <input type="number" id="soni" name="soni" value="1" min="1" oninput="tekshirBuket()" required>
             </div>
 
-            <!-- Faqat 2 ta va undan ko'p buket bo'lganda ochiladigan blok -->
             <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
-                <label for="km">Masofa (Necha kilometr uzoqlikda joylashgansiz?):</label>
+                <label for="km">Masofa (Necha kilometr uzoqlikdasiz?):</label>
                 <input type="number" id="km" name="km" value="0" min="0" placeholder="Masalan: 5">
-                <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
+                <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
             </div>
 
             <div class="forma-guruh" id="oziOlibKetishMatn">
@@ -146,25 +145,21 @@ SAYT_DIZAYNI = """
     </div>
 
     <script>
-        function tekshirBuketSoni() {
-            var soni = document.getElementById("soni").value;
-            var yetkazishBlok = document.getElementById("yetkazishBlok");
-            var oziOlibKetishMatn = document.getElementById("oziOlibKetishMatn");
-            var kmInput = document.getElementById("km");
-            
-            if (soni >= 2) {
-                yetkazishBlok.style.display = "block";
-                oziOlibKetishMatn.style.display = "none";
-                kmInput.required = true;
+        function tekshirBuket() {
+            var s = document.getElementById("soni").value;
+            var yb = document.getElementById("yetkazishBlok");
+            var ok = document.getElementById("oziOlibKetishMatn");
+            var k = document.getElementById("km");
+            if (s >= 2) {
+                yb.style.display = "block";
+                ok.style.display = "none";
             } else {
-                yetkazishBlok.style.display = "none";
-                oziOlibKetishMatn.style.display = "block";
-                kmInput.value = 0;
-                kmInput.required = false;
+                yb.style.display = "none";
+                ok.style.display = "block";
+                k.value = 0;
             }
         }
-        // Sahifa yuklanganda bir marta tekshirib oladi
-        tekshirBuketSoni();
+        tekshirBuket();
     </script>
 </body>
 </html>
@@ -177,12 +172,12 @@ def index():
         ism = request.form.get("ism", "Kiritilmagan")
         gul_turi = request.form.get("gul_turi")
         soni = int(request.form.get("soni", 1))
-        km = int(request.form.get("km", 0))
+        km = request.form.get("km")
+        km = int(km) if km else 0
         sana = request.form.get("sana")
         telefon = request.form.get("telefon")
         izoh = request.form.get("izoh", "Yo'q")
         
-        # Buket narxlari
         if gul_turi == "Oq Ayiq (Beleviy Mishka) Buketi":
             bitta_buket_narxi = 80000
         else:
@@ -190,7 +185,23 @@ def index():
             
         gullar_narxi = soni * bitta_buket_narxi
         
-        # Yetkazish xizmatini hisoblash (Faqat 2 ta va undan ko'p buket uchun)
         if soni >= 2:
             yetkazish_narxi = km * 3000
             umumiy_narx = gullar_narxi + yetkazish_narxi
+            yetkazish_matni = f"{yetkazish_narxi:,} so'm ({km} km uchun)"
+            turi = "🚗 Yandex yetkazib berish xizmati bilan"
+        else:
+            umumiy_narx = gullar_narxi
+            yetkazish_matni = "0 so'm (O'zi olib ketadi)"
+            turi = "🏃‍♂️ O'zi olib ketish (Samovivoz)"
+            
+        narx_matni = f"{umumiy_narx:,} so'm"
+        
+        telegram_xabari = (
+            f"🛍 **YANGI BUYURTMA KELDI!**\n\n"
+            f"👤 **Mijoz ismi:** {ism}\n"
+            f"💐 **Gul turi:** {gul_turi}\n"
+            f"🔢 **Buket soni:** {soni} ta buket (har birida 10 tadan gul)\n"
+            f"📦 **Xizmat turi:** {turi}\n"
+            f"🛣 **Masofa:** {km} km\n"
+            f"🚚 **Yo'l kira haqi:** {yetkazish_matni}\n"
