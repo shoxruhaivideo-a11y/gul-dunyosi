@@ -10,7 +10,7 @@ TELEGRAM_ID = os.environ.get('TELEGRAM_ID')
 bot = telebot.TeleBot(BOT_TOKEN)
 app = Flask(__name__)
 
-# Avtomatik yetkazib berishni hisoblaydigan xatosiz dizayn
+# Barcha funksiyalar va haqiqiy rasmlar jamlangan Python dizayni
 SAYT_DIZAYNI = """
 <!DOCTYPE html>
 <html lang="uz">
@@ -30,7 +30,7 @@ SAYT_DIZAYNI = """
         @media (max-width: 500px) { .gullar-galereya { grid-template-columns: 1fr; } }
         
         .gul-karta { border: 2px solid #ffb6c1; border-radius: 15px; padding: 15px; text-align: center; background: #fffdfd; display: flex; flex-direction: column; justify-content: space-between; }
-        .gul-karta img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; }
+        .gul-karta img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; background-color: #ffe4e1; }
         .gul-nomi { font-size: 16px; font-weight: bold; color: #db7093; margin: 10px 0 5px 0; }
         .narx { font-size: 13px; margin: 3px 0; color: #555; }
         .narx strong { color: #ff1493; }
@@ -40,17 +40,21 @@ SAYT_DIZAYNI = """
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #db7093; }
         input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ffb6c1; border-radius: 10px; box-sizing: border-box; font-size: 15px; background-color: #fff0f5; }
         input:focus, textarea:focus, select:focus { outline: none; border-color: #ff69b4; background-color: #fff; }
-        button { width: 100%; background: #ff69b4; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
-        button:hover { background: #db7093; }
-        .muvaffaqiyat { background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; font-weight: bold; }
+        
+        .manzil-tugma { background: #ffe4e1; border: 1px solid #ffb6c1; padding: 8px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-right: 5px; margin-top: 5px; display: inline-block; transition: 0.2s; color: #4a4a4a; }
+        .manzil-tugma:hover { background: #ff69b4; color: white; }
+        
+        button.btn-yubor { width: 100%; background: #ff69b4; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
+        button.btn-yubor:hover { background: #db7093; }
         
         .shart-blok { background: #fff9fa; border: 1px dashed #ffb6c1; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 15px; color: #c71585; }
+        .map-container { width: 100%; height: 250px; border-radius: 15px; overflow: hidden; border: 2px solid #ffb6c1; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌸 Gul Dunyosi 🌸</h1>
-        <div class="subtitle">Onlayn buyurtma va yetkazib berish</div>
+        <div class="subtitle">Onlayn buyurtma va Yandex yetkazib berish</div>
         
         <div class="aloqa-blok">
             Biz bilan bog'lanish: <a href="tel:+998909180630">+998 (90) 918-06-30</a> | 
@@ -58,14 +62,14 @@ SAYT_DIZAYNI = """
         </div>
 
         <div class="shart-blok">
-            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi.
+            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi (Samovivoz).
         </div>
 
         {% if xabar %}
             <div class="muvaffaqiyat">{{ xabar }}</div>
         {% endif %}
 
-        <!-- Vitrina: Haqiqiy o'xshash professional rasmlar bilan -->
+        <!-- Gullar vitrinasi -->
         <div class="gullar-galereya">
             <div class="gul-karta">
                 <img src="https://unsplash.com" alt="Oq ayiq">
@@ -103,7 +107,7 @@ SAYT_DIZAYNI = """
 
             <div class="forma-guruh">
                 <label for="gul_turi">Buket turini tanlang:</label>
-                <select id="gul_turi" name="gul_turi">
+                <select id="gul_turi" name="gul_turi" onchange="tekshirBuket()">
                     <option value="Oq Ayiq (Beleviy Mishka) Buketi">Oq Ayiq (Beleviy Mishka) — 80,000 so'm</option>
                     <option value="Olovrang xrizantema buketi">Olovrang xrizantema — 35,000 so'm</option>
                     <option value="Pushti xrizantema buketi">Pushti xrizantema — 35,000 so'm</option>
@@ -115,10 +119,25 @@ SAYT_DIZAYNI = """
                 <input type="number" id="soni" name="soni" value="1" min="1" oninput="tekshirBuket()" required>
             </div>
 
+            <!-- Yandex Xarita va Manzil Tanlash Bloki -->
             <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
-                <label for="km">Masofa (Necha kilometr uzoqlikdasiz?):</label>
-                <input type="number" id="km" name="km" value="0" min="0" placeholder="Masalan: 5">
-                <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
+                <label>Yetkazib berish manzili (Tepadan tanlang yoki o'zingiz yozing):</label>
+                <div style="margin-bottom: 10px;">
+                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili Yuqori Darxon Beltepa 20 uy')">📍 Sergili Beltepa 20-uy (Do'kon)</span>
+                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili 9 hudud')">📍 Sergili 9 hudud</span>
+                </div>
+                <input type="text" id="manzil" name="manzil" placeholder="Yetkazish manzilini to'liq kiriting...">
+                
+                <div class="forma-guruh" style="margin-top: 15px;">
+                    <label for="km">Masofa (Do'kondan uyingizgacha necha km?):</label>
+                    <input type="number" id="km" name="km" value="0" min="0" placeholder="Masalan: 5">
+                    <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
+                </div>
+
+                <!-- Yandex Xarita oynasi -->
+                <div class="map-container">
+                    <iframe src="https://yandex.ru" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
+                </div>
             </div>
 
             <div class="forma-guruh" id="oziOlibKetishMatn">
@@ -132,15 +151,15 @@ SAYT_DIZAYNI = """
 
             <div class="forma-guruh">
                 <label for="telefon">Telefon raqamingiz</label>
-                <input type="tel" id="telefon" name="telefon" placeholder="+998 90 123 45 67" value="+998" required>
+                <input type="tel" id="telefon" name="telefon" value="+998" required>
             </div>
 
             <div class="forma-guruh">
-                <label for="izoh">Yetkazish manzili yoki qo'shimcha istaklar:</label>
-                <textarea id="izoh" name="izoh" rows="3" placeholder="Masalan: Uy raqami, lenta rangi va hokazo..."></textarea>
+                <label for="izoh">Qo'shimcha izohlar:</label>
+                <textarea id="izoh" name="izoh" rows="2" placeholder="Masalan: pod'ezd raqami, lenta rangi..."></textarea>
             </div>
 
-            <button type="submit">🌸 Buyurtma berish 🌸</button>
+            <button type="submit" class="btn-yubor">🌸 Buyurtma berish 🌸</button>
         </form>
     </div>
 
@@ -149,59 +168,21 @@ SAYT_DIZAYNI = """
             var s = document.getElementById("soni").value;
             var yb = document.getElementById("yetkazishBlok");
             var ok = document.getElementById("oziOlibKetishMatn");
+            var m = document.getElementById("manzil");
             var k = document.getElementById("km");
             if (s >= 2) {
                 yb.style.display = "block";
                 ok.style.display = "none";
+                m.required = true;
+                k.required = true;
             } else {
                 yb.style.display = "none";
                 ok.style.display = "block";
+                m.value = "";
+                m.required = false;
                 k.value = 0;
+                k.required = false;
             }
         }
-        tekshirBuket();
-    </script>
-</body>
-</html>
-"""
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    xabar = None
-    if request.method == "POST":
-        ism = request.form.get("ism", "Kiritilmagan")
-        gul_turi = request.form.get("gul_turi")
-        soni = int(request.form.get("soni", 1))
-        km = request.form.get("km")
-        km = int(km) if km else 0
-        sana = request.form.get("sana")
-        telefon = request.form.get("telefon")
-        izoh = request.form.get("izoh", "Yo'q")
-        
-        if gul_turi == "Oq Ayiq (Beleviy Mishka) Buketi":
-            bitta_buket_narxi = 80000
-        else:
-            bitta_buket_narxi = 35000
-            
-        gullar_narxi = soni * bitta_buket_narxi
-        
-        if soni >= 2:
-            yetkazish_narxi = km * 3000
-            umumiy_narx = gullar_narxi + yetkazish_narxi
-            yetkazish_matni = f"{yetkazish_narxi:,} so'm ({km} km uchun)"
-            turi = "🚗 Yandex yetkazib berish xizmati bilan"
-        else:
-            umumiy_narx = gullar_narxi
-            yetkazish_matni = "0 so'm (O'zi olib ketadi)"
-            turi = "🏃‍♂️ O'zi olib ketish (Samovivoz)"
-            
-        narx_matni = f"{umumiy_narx:,} so'm"
-        
-        telegram_xabari = (
-            f"🛍 **YANGI BUYURTMA KELDI!**\n\n"
-            f"👤 **Mijoz ismi:** {ism}\n"
-            f"💐 **Gul turi:** {gul_turi}\n"
-            f"🔢 **Buket soni:** {soni} ta buket (har birida 10 tadan gul)\n"
-            f"📦 **Xizmat turi:** {turi}\n"
-            f"🛣 **Masofa:** {km} km\n"
-            f"🚚 **Yo'l kira haqi:** {yetkazish_matni}\n"
+        function tanlaManzil(joy) {
