@@ -27,7 +27,7 @@
         input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ffb6c1; border-radius: 10px; box-sizing: border-box; font-size: 15px; background-color: #fff0f5; }
         input:focus, textarea:focus, select:focus { outline: none; border-color: #ff69b4; background-color: #fff; }
         
-        .manzil-tugma { background: #ffe4e1; border: 1px solid #ffb6c1; padding: 8px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-right: 5px; margin-top: 5px; display: inline-block; transition: 0.2s; }
+        .manzil-tugma { background: #ffe4e1; border: 1px solid #ffb6c1; padding: 8px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-right: 5px; margin-top: 5px; display: inline-block; transition: 0.2s; color: #4a4a4a; }
         .manzil-tugma:hover { background: #ff69b4; color: white; }
         
         button.btn-yubor { width: 100%; background: #ff69b4; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
@@ -48,10 +48,10 @@
         </div>
 
         <div class="shart-blok">
-            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi. 1 ta buket bo'lsa, faqat o'zi olib ketadi (Samovivoz).
+            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi (Samovivoz).
         </div>
 
-        <!-- Gullar vitrinasi (Rasmlari bilan) -->
+        <!-- Gullar vitrinasi -->
         <div class="gullar-galereya">
             <div class="gul-karta">
                 <img src="https://unsplash.com" alt="Oq ayiq">
@@ -81,7 +81,7 @@
             </div>
         </div>
 
-        <form onsubmit="yuborTelegram(event)">
+        <form id="buyurtmaForma" onsubmit="yuborTelegram(event)">
             <div class="forma-guruh">
                 <label for="ism">Ismingiz:</label>
                 <input type="text" id="ism" placeholder="Ismingizni kiriting..." required>
@@ -103,14 +103,20 @@
 
             <!-- Yandex Xarita va Manzil Tanlash Bloki -->
             <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
-                <label>Yetkazib berish manzili (Yandex Map):</label>
+                <label>Yetkazib berish manzili (Tepadan tanlang yoki o'zingiz yozing):</label>
                 <div style="margin-bottom: 10px;">
-                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili Beltepa 18, Yuqori Darxon')">📍 Sergili Beltepa 18</span>
-                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili 9-hudud')">📍 Sergili 9-hudud</span>
+                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili Yuqori Darxon Beltepa 20 uy')">📍 Sergili Beltepa 20-uy (Do'kon)</span>
+                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili 9 hudud')">📍 Sergili 9 hudud</span>
                 </div>
-                <input type="text" id="manzil" placeholder="Manzilni kiriting yoki tepadan tanlang...">
+                <input type="text" id="manzil" placeholder="Yetkazish manzilini to'liq kiriting...">
                 
-                <!-- Haqiqiy Yandex Xarita oynasi -->
+                <div class="forma-guruh" style="margin-top: 15px;">
+                    <label for="km">Masofa (Do'kondan uyingizgacha necha km?):</label>
+                    <input type="number" id="km" value="0" min="0" placeholder="Masalan: 5">
+                    <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
+                </div>
+
+                <!-- Yandex Xarita oynasi (Sergili Yuqori Darxon Beltepaga moslangan) -->
                 <div class="map-container">
                     <iframe src="https://yandex.ru" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
                 </div>
@@ -145,15 +151,19 @@
             var yb = document.getElementById("yetkazishBlok");
             var ok = document.getElementById("oziOlibKetishMatn");
             var m = document.getElementById("manzil");
+            var k = document.getElementById("km");
             if (s >= 2) {
                 yb.style.display = "block";
                 ok.style.display = "none";
                 m.required = true;
+                k.required = true;
             } else {
                 yb.style.display = "none";
                 ok.style.display = "block";
                 m.value = "";
                 m.required = false;
+                k.value = 0;
+                k.required = false;
             }
         }
 
@@ -168,13 +178,3 @@
             var gul = select.value;
             var narx = parseInt(select.options[select.selectedIndex].getAttribute("data-narx"));
             var soni = parseInt(document.getElementById("soni").value);
-            var sana = document.getElementById("sana").value;
-            var tel = document.getElementById("telefon").value;
-            var manzil = document.getElementById("manzil").value || "O'zi olib ketadi (Samovivoz)";
-            var izoh = document.getElementById("izoh").value || "Yo'q";
-
-            var jami = soni * narx;
-            var xizmat = soni >= 2 ? "🚗 Yandex Yetkazib berish" : "🏃‍♂️ O'zi olib ketish (Samovivoz)";
-
-            var matn = `🛍 YANGI BUYURTMA KELDI!\n\n👤 Mijoz: ${ism}\n💐 Turi: ${gul}\n🔢 Soni: ${soni} ta buket\n📦 Xizmat: ${xizmat}\n📍 Manzil: ${manzil}\n💰 Jami summa: ${jami.toLocaleString()} so'm\n📅 Qachonga: ${sana}\n📞 Tel: ${tel}\n✍️ Izoh: ${izoh}`;
-            
