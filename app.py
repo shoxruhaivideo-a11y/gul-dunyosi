@@ -1,188 +1,43 @@
 import os
-from flask import Flask, request, render_template_string
+import sys
+
+# Render serverida kutubxonani avtomatik o'rnatish
+os.system(f"{sys.executable} -m pip install pyTelegramBotAPI")
 import telebot
 
-# Render'da xavfsiz kiritilgan muhit o'zgaruvchilarini olish
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-TELEGRAM_ID = os.environ.get('TELEGRAM_ID')
+TOKEN = "9135831262:AAH-erD3OU-TVWfTqp8HomVJjnBMwMMi-mQ"
+MY_ID = 8643953727  
 
-# Botni ishga tushirish
-bot = telebot.TeleBot(BOT_TOKEN)
-app = Flask(__name__)
+bot = telebot.TeleBot(TOKEN)
 
-# Barcha funksiyalar va haqiqiy rasmlar jamlangan Python dizayni
-SAYT_DIZAYNI = """
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gul Dunyosi — Onlayn do'kon</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #fff0f5; color: #4a4a4a; margin: 0; padding: 20px; }
-        .container { max-width: 600px; background: white; margin: 0 auto; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        h1 { color: #ff69b4; text-align: center; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #db7093; font-style: italic; margin-bottom: 25px; }
-        .aloqa-blok { text-align: center; background: #ffe4e1; padding: 10px; border-radius: 10px; margin-bottom: 25px; font-size: 14px; }
-        .aloqa-blok a { color: #db7093; text-decoration: none; font-weight: bold; }
-        
-        .gullar-galereya { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        @media (max-width: 500px) { .gullar-galereya { grid-template-columns: 1fr; } }
-        
-        .gul-karta { border: 2px solid #ffb6c1; border-radius: 15px; padding: 15px; text-align: center; background: #fffdfd; display: flex; flex-direction: column; justify-content: space-between; }
-        .gul-karta img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; background-color: #ffe4e1; }
-        .gul-nomi { font-size: 16px; font-weight: bold; color: #db7093; margin: 10px 0 5px 0; }
-        .narx { font-size: 13px; margin: 3px 0; color: #555; }
-        .narx strong { color: #ff1493; }
-        .tarkib { font-size: 12px; color: #777; font-style: italic; }
-        
-        .forma-guruh { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #db7093; }
-        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ffb6c1; border-radius: 10px; box-sizing: border-box; font-size: 15px; background-color: #fff0f5; }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: #ff69b4; background-color: #fff; }
-        
-        .manzil-tugma { background: #ffe4e1; border: 1px solid #ffb6c1; padding: 8px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-right: 5px; margin-top: 5px; display: inline-block; transition: 0.2s; color: #4a4a4a; }
-        .manzil-tugma:hover { background: #ff69b4; color: white; }
-        
-        button.btn-yubor { width: 100%; background: #ff69b4; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
-        button.btn-yubor:hover { background: #db7093; }
-        
-        .shart-blok { background: #fff9fa; border: 1px dashed #ffb6c1; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 15px; color: #c71585; }
-        .map-container { width: 100%; height: 250px; border-radius: 15px; overflow: hidden; border: 2px solid #ffb6c1; margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🌸 Gul Dunyosi 🌸</h1>
-        <div class="subtitle">Onlayn buyurtma va Yandex yetkazib berish</div>
-        
-        <div class="aloqa-blok">
-            Biz bilan bog'lanish: <a href="tel:+998909180630">+998 (90) 918-06-30</a> | 
-            Telegram: <a href="https://t.me" target="_blank">@Shoqqivines777</a>
-        </div>
+@bot.message_handler(commands=['start'])
+def start_message(message):
+    markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn = telebot.types.KeyboardButton("🛍 Buyurtma berish")
+    markup.add(btn)
+    bot.send_message(
+        message.chat.id, 
+        "🌹 Gul Dunyosi do'konimizga xush kelibsiz!\n\nBuyurtma berish uchun quyidagi tugmani bosing:", 
+        reply_markup=markup
+    )
 
-        <div class="shart-blok">
-            📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi (Samovivoz).
-        </div>
+@bot.message_handler(func=lambda message: message.text == "🛍 Buyurtma berish")
+def handle_order(message):
+    tekst = (
+        f"🔔 <b>YANGI GUL BUYURTMASI TUSHDI!</b>\n\n"
+        f"👤 <b>Mijoz:</b> {message.from_user.full_name}\n"
+        f"📦 <b>Mahsulot:</b> 1x Qizil Atirgullar guldastasi\n"
+        f"💰 <b>Summa:</b> 150,000 so'm\n\n"
+        f"📍 <a href='https://yandex.com'>Yandex Xaritada ko'rish</a>"
+    )
+    try:
+        rasm_url = "https://unsplash.com"
+        bot.send_photo(chat_id=MY_ID, photo=rasm_url, caption=tekst, parse_mode="HTML")
+        bot.send_location(chat_id=MY_ID, latitude=41.311081, longitude=69.240562)
+        bot.send_message(message.chat.id, "✅ Buyurtmangiz qabul qilindi! Tez orada administrator bog'lanadi.")
+    except Exception as e:
+        bot.send_message(message.chat.id, f"Xatolik: {e}")
 
-        {% if xabar %}
-            <div class="muvaffaqiyat">{{ xabar }}</div>
-        {% endif %}
-
-        <!-- Gullar vitrinasi -->
-        <div class="gullar-galereya">
-            <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Oq ayiq">
-                <div>
-                    <div class="gul-nomi">Oq Ayiq (Beleviy Mishka)</div>
-                    <div class="narx">1 Buket: <strong>80 000 so'm</strong></div>
-                    <div class="tarkib">(1 ta buketda 10 dona gul)</div>
-                </div>
-            </div>
-            
-            <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Olovrang">
-                <div>
-                    <div class="gul-nomi">Olovrang Xrizantema</div>
-                    <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
-                    <div class="tarkib">(1 ta buketda 10 dona gul)</div>
-                </div>
-            </div>
-
-            <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Pushti">
-                <div>
-                    <div class="gul-nomi">Pushti Xrizantema</div>
-                    <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
-                    <div class="tarkib">(1 ta buketda 10 dona gul)</div>
-                </div>
-            </div>
-        </div>
-
-        <form method="POST" action="/" id="buyurtmaForma">
-            <div class="forma-guruh">
-                <label for="ism">Ismingiz:</label>
-                <input type="text" id="ism" name="ism" placeholder="Ismingizni kiriting..." required>
-            </div>
-
-            <div class="forma-guruh">
-                <label for="gul_turi">Buket turini tanlang:</label>
-                <select id="gul_turi" name="gul_turi" onchange="tekshirBuket()">
-                    <option value="Oq Ayiq (Beleviy Mishka) Buketi">Oq Ayiq (Beleviy Mishka) — 80,000 so'm</option>
-                    <option value="Olovrang xrizantema buketi">Olovrang xrizantema — 35,000 so'm</option>
-                    <option value="Pushti xrizantema buketi">Pushti xrizantema — 35,000 so'm</option>
-                </select>
-            </div>
-
-            <div class="forma-guruh">
-                <label for="soni">Nechta buket kerak?</label>
-                <input type="number" id="soni" name="soni" value="1" min="1" oninput="tekshirBuket()" required>
-            </div>
-
-            <!-- Yandex Xarita va Manzil Tanlash Bloki -->
-            <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
-                <label>Yetkazib berish manzili (Tepadan tanlang yoki o'zingiz yozing):</label>
-                <div style="margin-bottom: 10px;">
-                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili Yuqori Darxon Beltepa 20 uy')">📍 Sergili Beltepa 20-uy (Do'kon)</span>
-                    <span class="manzil-tugma" onclick="tanlaManzil('Sergili 9 hudud')">📍 Sergili 9 hudud</span>
-                </div>
-                <input type="text" id="manzil" name="manzil" placeholder="Yetkazish manzilini to'liq kiriting...">
-                
-                <div class="forma-guruh" style="margin-top: 15px;">
-                    <label for="km">Masofa (Do'kondan uyingizgacha necha km?):</label>
-                    <input type="number" id="km" name="km" value="0" min="0" placeholder="Masalan: 5">
-                    <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
-                </div>
-
-                <!-- Yandex Xarita oynasi -->
-                <div class="map-container">
-                    <iframe src="https://yandex.ru" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
-                </div>
-            </div>
-
-            <div class="forma-guruh" id="oziOlibKetishMatn">
-                <p style="color: #dc3545; font-size: 14px; font-weight: bold;">⚠️ 1 ta buket uchun yetkazib berish mavjud emas. Faqat o'zingiz olib ketishingiz (Samovivoz) mumkin.</p>
-            </div>
-
-            <div class="forma-guruh">
-                <label for="sana">Qaysi kunga kerak?</label>
-                <input type="date" id="sana" name="sana" required>
-            </div>
-
-            <div class="forma-guruh">
-                <label for="telefon">Telefon raqamingiz</label>
-                <input type="tel" id="telefon" name="telefon" value="+998" required>
-            </div>
-
-            <div class="forma-guruh">
-                <label for="izoh">Qo'shimcha izohlar:</label>
-                <textarea id="izoh" name="izoh" rows="2" placeholder="Masalan: pod'ezd raqami, lenta rangi..."></textarea>
-            </div>
-
-            <button type="submit" class="btn-yubor">🌸 Buyurtma berish 🌸</button>
-        </form>
-    </div>
-
-    <script>
-        function tekshirBuket() {
-            var s = document.getElementById("soni").value;
-            var yb = document.getElementById("yetkazishBlok");
-            var ok = document.getElementById("oziOlibKetishMatn");
-            var m = document.getElementById("manzil");
-            var k = document.getElementById("km");
-            if (s >= 2) {
-                yb.style.display = "block";
-                ok.style.display = "none";
-                m.required = true;
-                k.required = true;
-            } else {
-                yb.style.display = "none";
-                ok.style.display = "block";
-                m.value = "";
-                m.required = false;
-                k.value = 0;
-                k.required = false;
-            }
-        }
-
-        function tanlaManzil(joy) {
+if __name__ == '__main__':
+    print("Gul Dunyosi Boti muvaffaqiyatli yoqildi!")
+    bot.infinity_polling()
