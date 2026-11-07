@@ -1,1 +1,2 @@
-# gul-dunyosi
+# Gullar Dunyosi Internet Do'koni 
+
