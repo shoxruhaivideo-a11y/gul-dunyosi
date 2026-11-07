@@ -11,30 +11,23 @@
         .subtitle { text-align: center; color: #db7093; font-style: italic; margin-bottom: 25px; }
         .aloqa-blok { text-align: center; background: #ffe4e1; padding: 10px; border-radius: 10px; margin-bottom: 25px; font-size: 14px; }
         .aloqa-blok a { color: #db7093; text-decoration: none; font-weight: bold; }
-        
         .gullar-galereya { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         @media (max-width: 500px) { .gullar-galereya { grid-template-columns: 1fr; } }
-        
         .gul-karta { border: 2px solid #ffb6c1; border-radius: 15px; padding: 15px; text-align: center; background: #fffdfd; display: flex; flex-direction: column; justify-content: space-between; }
         .gul-karta img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; background-color: #ffe4e1; }
         .gul-nomi { font-size: 16px; font-weight: bold; color: #db7093; margin: 10px 0 5px 0; }
         .narx { font-size: 13px; margin: 3px 0; color: #555; }
         .narx strong { color: #ff1493; }
         .tarkib { font-size: 12px; color: #777; font-style: italic; }
-        
         .forma-guruh { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #db7093; }
         input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ffb6c1; border-radius: 10px; box-sizing: border-box; font-size: 15px; background-color: #fff0f5; }
         input:focus, textarea:focus, select:focus { outline: none; border-color: #ff69b4; background-color: #fff; }
-        
         .manzil-tugma { background: #ffe4e1; border: 1px solid #ffb6c1; padding: 8px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; margin-right: 5px; margin-top: 5px; display: inline-block; transition: 0.2s; color: #4a4a4a; }
         .manzil-tugma:hover { background: #ff69b4; color: white; }
-        
         button.btn-yubor { width: 100%; background: #ff69b4; color: white; border: none; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
         button.btn-yubor:hover { background: #db7093; }
-        
         .shart-blok { background: #fff9fa; border: 1px dashed #ffb6c1; padding: 10px; border-radius: 10px; font-size: 13px; margin-bottom: 15px; color: #c71585; }
-        .map-container { width: 100%; height: 250px; border-radius: 15px; overflow: hidden; border: 2px solid #ffb6c1; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -51,10 +44,9 @@
             📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi (Samovivoz).
         </div>
 
-        <!-- Gullar vitrinasi (Rasmlar manzili to'g'rilandi) -->
         <div class="gullar-galereya">
             <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Oq ayiq">
+                <img src="https://telegra.ph" alt="Oq ayiq">
                 <div>
                     <div class="gul-nomi">Oq Ayiq (Beleviy Mishka)</div>
                     <div class="narx">1 Buket: <strong>80 000 so'm</strong></div>
@@ -63,7 +55,7 @@
             </div>
             
             <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Olovrang">
+                <img src="https://telegra.ph" alt="Olovrang">
                 <div>
                     <div class="gul-nomi">Olovrang Xrizantema</div>
                     <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
@@ -72,7 +64,7 @@
             </div>
 
             <div class="gul-karta">
-                <img src="https://unsplash.com" alt="Pushti">
+                <img src="https://telegra.ph" alt="Pushti">
                 <div>
                     <div class="gul-nomi">Pushti Xrizantema</div>
                     <div class="narx">1 Buket: <strong>35 000 so'm</strong></div>
@@ -101,7 +93,6 @@
                 <input type="number" id="soni" value="1" min="1" oninput="tekshirBuket()" required>
             </div>
 
-            <!-- Yandex Xarita va Manzil Tanlash Bloki -->
             <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
                 <label>Yetkazib berish manzili:</label>
                 <div style="margin-bottom: 10px;">
@@ -160,10 +151,8 @@
             document.getElementById("manzil").value = manzil;
         }
 
-        // SAYTDAN TO'G'RIdan-TO'G'RI SIZNING TELEGRAMINGIZGA SMS (XABAR) YUBORISH FUNKSIYASI
         function yuborTelegram(event) {
             event.preventDefault();
-            
             var token = "9135831262:AAH-erD3OU-TVWfTqp8HomVJjnBMwMMi-mQ";
             var chat_id = 8643953727;
             
@@ -177,4 +166,13 @@
             var selectElement = document.getElementById("gul_turi");
             var narx = selectElement.options[selectElement.selectedIndex].getAttribute("data-narx");
             var jami_gul_narxi = narx * soni;
+            
+            var yetkazish_matni = "🚗 O'zi olib ketadi (Samovivoz)";
+            if (soni >= 2) {
+                var km = document.getElementById("km").value || 0;
+                var km_narxi = km * 3000;
+                jami_gul_narxi += km_narxi;
+                var manzil = document.getElementById("manzil").value;
+                yetkazish_matni = "🚗 Yandex Yetkazish\n📍 Manzil: " + manzil + "\n🗺 Masofa: " + km + " km (+" + km_narxi.toLocaleString() + " so'm)";
+            }
             
