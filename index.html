@@ -51,7 +51,7 @@
             📌 <strong>Yetkazib berish sharti:</strong> 2 ta yoki undan ko'p buket olinsa Yandex orqali yetkaziladi (1 km = 3 000 so'm). 1 ta buket bo'lsa, faqat o'zi olib ketadi (Samovivoz).
         </div>
 
-        <!-- Gullar vitrinasi -->
+        <!-- Gullar vitrinasi (Rasmlar manzili to'g'rilandi) -->
         <div class="gullar-galereya">
             <div class="gul-karta">
                 <img src="https://unsplash.com" alt="Oq ayiq">
@@ -90,9 +90,9 @@
             <div class="forma-guruh">
                 <label for="gul_turi">Buket turini tanlang:</label>
                 <select id="gul_turi" onchange="tekshirBuket()">
-                    <option value="Oq Ayiq (Beleviy Mishka) Buketi" data-narx="80000">Oq Ayiq (Beleviy Mishka) — 80,000 so'm</option>
-                    <option value="Olovrang xrizantema buketi" data-narx="35000">Olovrang xrizantema — 35,000 so'm</option>
-                    <option value="Pushti xrizantema buketi" data-narx="35000">Pushti xrizantema — 35,000 so'm</option>
+                    <option value="Oq Ayiq (Beleviy Mishka)" data-narx="80000">Oq Ayiq (Beleviy Mishka) — 80,000 so'm</option>
+                    <option value="Olovrang Xrizantema" data-narx="35000">Olovrang xrizantema — 35,000 so'm</option>
+                    <option value="Pushti Xrizantema" data-narx="35000">Pushti xrizantema — 35,000 so'm</option>
                 </select>
             </div>
 
@@ -103,7 +103,7 @@
 
             <!-- Yandex Xarita va Manzil Tanlash Bloki -->
             <div class="forma-guruh" id="yetkazishBlok" style="display: none;">
-                <label>Yetkazib berish manzili (Tepadan tanlang yoki o'zingiz yozing):</label>
+                <label>Yetkazib berish manzili:</label>
                 <div style="margin-bottom: 10px;">
                     <span class="manzil-tugma" onclick="tanlaManzil('Sergili Yuqori Darxon Beltepa 20 uy')">📍 Sergili Beltepa 20-uy (Do'kon)</span>
                     <span class="manzil-tugma" onclick="tanlaManzil('Sergili 9 hudud')">📍 Sergili 9 hudud</span>
@@ -112,13 +112,8 @@
                 
                 <div class="forma-guruh" style="margin-top: 15px;">
                     <label for="km">Masofa (Do'kondan uyingizgacha necha km?):</label>
-                    <input type="number" id="km" value="0" min="0" placeholder="Masalan: 5">
+                    <input type="number" id="km" value="0" min="0" oninput="tekshirBuket()" placeholder="Masalan: 5">
                     <p style="font-size: 12px; color: #28a745; margin-top: 5px;">🚗 Yandex yetkazib berish: 1 km = 3,000 so'm qo'shiladi.</p>
-                </div>
-
-                <!-- Yandex Xarita oynasi -->
-                <div class="map-container">
-                    <iframe src="https://yandex.ru" width="100%" height="100%" frameborder="0" allowfullscreen="true"></iframe>
                 </div>
             </div>
 
@@ -132,50 +127,54 @@
             </div>
 
             <div class="forma-guruh">
-                <label for="telefon">Telefon raqamingiz</label>
+                <label for="telefon">Telefon raqamingiz:</label>
                 <input type="tel" id="telefon" value="+998" required>
             </div>
 
             <div class="forma-guruh">
                 <label for="izoh">Qo'shimcha izohlar:</label>
-                <textarea id="izoh" rows="2" placeholder="Masalan: pod'ezd raqami, lenta rangi..."></textarea>
+                <textarea id="izoh" rows="2" placeholder="Qo'shimcha istaklar bo'lsa yozing..."></textarea>
             </div>
 
-            <button type="submit" class="btn-yubor">🌸 Buyurtma berish 🌸</button>
+            <button type="submit" class="btn-yubor">🛒 Buyurtma berish</button>
         </form>
     </div>
 
     <script>
         function tekshirBuket() {
-            var s = document.getElementById("soni").value;
-            var yb = document.getElementById("yetkazishBlok");
-            var ok = document.getElementById("oziOlibKetishMatn");
-            var m = document.getElementById("manzil");
-            var k = document.getElementById("km");
-            if (s >= 2) {
-                yb.style.display = "block";
-                ok.style.display = "none";
-                m.required = true;
-                k.required = true;
+            var soni = document.getElementById("soni").value;
+            var yetkazishBlok = document.getElementById("yetkazishBlok");
+            var oziOlibKetishMatn = document.getElementById("oziOlibKetishMatn");
+            
+            if (soni >= 2) {
+                yetkazishBlok.style.display = "block";
+                oziOlibKetishMatn.style.display = "none";
             } else {
-                yb.style.display = "none";
-                ok.style.display = "block";
-                m.value = "";
-                m.required = false;
-                k.value = 0;
-                k.required = false;
+                yetkazishBlok.style.display = "none";
+                oziOlibKetishMatn.style.display = "block";
+                document.getElementById("km").value = 0;
             }
         }
 
-        function tanlaManzil(joy) {
-            document.getElementById("manzil").value = joy;
+        function tanlaManzil(manzil) {
+            document.getElementById("manzil").value = manzil;
         }
 
-        function yuborTelegram(e) {
-            e.preventDefault();
+        // SAYTDAN TO'G'RIdan-TO'G'RI SIZNING TELEGRAMINGIZGA SMS (XABAR) YUBORISH FUNKSIYASI
+        function yuborTelegram(event) {
+            event.preventDefault();
+            
+            var token = "9135831262:AAH-erD3OU-TVWfTqp8HomVJjnBMwMMi-mQ";
+            var chat_id = 8643953727;
+            
             var ism = document.getElementById("ism").value;
-            var select = document.getElementById("gul_turi");
-            var gul = select.value;
-            var narx = parseInt(select.options[select.selectedIndex].getAttribute("data-narx"));
-            var soni = parseInt(document.getElementById("soni").value);
-            var km = parseInt(document.getElementById("km").value) || 0;
+            var gul_turi = document.getElementById("gul_turi").value;
+            var soni = document.getElementById("soni").value;
+            var sana = document.getElementById("sana").value;
+            var telefon = document.getElementById("telefon").value;
+            var izoh = document.getElementById("izoh").value;
+            
+            var selectElement = document.getElementById("gul_turi");
+            var narx = selectElement.options[selectElement.selectedIndex].getAttribute("data-narx");
+            var jami_gul_narxi = narx * soni;
+            
