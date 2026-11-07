@@ -1,7 +1,8 @@
 import os
 import sys
+from flask import Flask, send_from_directory
 
-# Kutubxonani avtomatik o'rnatish
+# Kutubxonani onlayn o'rnatish va tekshirish
 try:
     import telebot
 except ImportError:
@@ -9,19 +10,26 @@ except ImportError:
     import telebot
 
 from telebot import types
+import threading
 
+# Flask veb-sayt serveri
+app = Flask(__name__, static_folder='.')
+
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
+# Telegram Bot sozlamalari
 TOKEN = "9135831262:AAH-erD3OU-TVWfTqp8HomVJjnBMwMMi-mQ"
 MY_ID = 8643953727  
-
 bot = telebot.TeleBot(TOKEN)
 
-# Mahsulotlar ro'yxati
+# Guldastalar ro'yxati (Telegram uchun)
 PRODUCTS = {
-    "1": {"name": "Qizil Atirgurlar", "price": 150000, "image": "https://unsplash.com"},
-    "2": {"name": "Oq Lilliyalar", "price": 180000, "image": "https://unsplash.com"},
-    "3": {"name": "Mikst Guldasta", "price": 220000, "image": "https://unsplash.com"}
+    "1": {"name": "Qizil Atirgurlar", "price": 150000, "image": "https://telegra.ph"},
+    "2": {"name": "Oq Lilliyalar", "price": 180000, "image": "https://telegra.ph"},
+    "3": {"name": "Mikst Guldasta", "price": 220000, "image": "https://telegra.ph"}
 }
-
 user_orders = {}
 
 @bot.message_handler(commands=['start'])
@@ -96,7 +104,7 @@ def finish_order(chat_id):
     total_price = prod["price"] * data["quantity"]
     delivery_text = f"🚗 {data['delivery']}"
     if "lat" in data:
-        distance = 5  # Taxminiy km (Yandex xaritadan ko'rib aniqlaysiz)
+        distance = 5  
         delivery_cost = distance * 3000
         total_price += delivery_cost
         delivery_text += f"\n🗺 Masofa: {distance} km (+{delivery_cost:,} so'm)"
@@ -119,5 +127,13 @@ def finish_order(chat_id):
         print(f"Xatolik: {e}")
     user_orders.pop(chat_id, None)
 
-if __name__ == '__main__':
+def run_bot():
     bot.infinity_polling()
+
+if __name__ == '__main__':
+    # Botni alohida oqimda (thread) yurgizamiz
+    t = threading.Thread(target=run_bot)
+    t.start()
+    # Veb-sayt serverini portda ochamiz
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
