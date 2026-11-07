@@ -10,7 +10,7 @@ except ImportError:
 
 from telebot import types
 
-TOKEN = "9135831262:AAH-erD3OU-TVWfTqp8HomVJjnBMwMMi-mQ"
+TOKEN = 9135831262:AAH42--ULxsDtjkYlBr7teUsy1gFYQ-Ss5U
 MY_ID = 8643953727  
 
 bot = telebot.TeleBot(TOKEN)
