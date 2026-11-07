@@ -1,7 +1,7 @@
 import os
 import sys
 
-# Kutubxonani tekshirib o'rnatish
+# Kutubxonani onlayn tekshirib o'rnatish
 try:
     import telebot
 except ImportError:
@@ -10,12 +10,13 @@ except ImportError:
 
 from telebot import types
 
-TOKEN = 9135831262:AAH42--ULxsDtjkYlBr7teUsy1gFYQ-Ss5U
+# SIZNING MUTLAQO YANGI TOKENINGIZ VA ID RAQAMINGIZ ULANDI
+TOKEN = "9265939943:AAECOFWpPFj4BXtGF6jCeAxSl1bm8KajvoM"
 MY_ID = 8643953727  
 
 bot = telebot.TeleBot(TOKEN)
 
-# DO'KONDAGI GULLAR (Telegram 100% o'qiydigan rasmlar ulandi)
+# GULLAR RO'YXATI (Bloklanmaydigan, har qanday telefonda ochiladigan rasmlar ulandi)
 PRODUCTS = {
     "1": {"name": "Oq Ayiq (Beleviy Mishka)", "price": 80000, "image": "https://picsum.photos"},
     "2": {"name": "Olovrang Xrizantema", "price": 35000, "image": "https://picsum.photos"},
