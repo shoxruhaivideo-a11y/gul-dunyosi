@@ -1,7 +1,6 @@
 import os
 import sys
 
-# Kutubxonani onlayn tekshirib o'rnatish
 try:
     import telebot
 except ImportError:
@@ -10,13 +9,12 @@ except ImportError:
 
 from telebot import types
 
-# SIZNING MUTLAQO YANGI TOKENINGIZ VA ID RAQAMINGIZ ULANDI
-TOKEN = "9265939943:AAECOFWpPFj4BXtGF6jCeAxSl1bm8KajvoM"
+# SIZNING ASLIY TO'G'RI TOKENINGIZ VA ID RAQAMINGIZ JOYLASHDI
+TOKEN = "9265939943:AAECOFWpPFj4BXrGF6jCeAxSl1bm8KajvoM"
 MY_ID = 8643953727  
 
 bot = telebot.TeleBot(TOKEN)
 
-# GULLAR RO'YXATI (Bloklanmaydigan, har qanday telefonda ochiladigan rasmlar ulandi)
 PRODUCTS = {
     "1": {"name": "Oq Ayiq (Beleviy Mishka)", "price": 80000, "image": "https://picsum.photos"},
     "2": {"name": "Olovrang Xrizantema", "price": 35000, "image": "https://picsum.photos"},
@@ -43,7 +41,7 @@ def show_products(message):
 @bot.callback_query_handler(func=lambda call: call.data.startswith("select_"))
 def product_selected(call):
     chat_id = call.message.chat.id
-    user_orders[chat_id]["product_key"] = call.data.split("_")[1]
+    user_orders[chat_id]["product_key"] = call.data.split("_")
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add("1", "2", "3", "4", "5")
     bot.send_message(chat_id, "🔢 Nechta buket buyurtma qilasiz? (Raqam kiriting):", reply_markup=markup)
@@ -63,20 +61,20 @@ def get_name(message):
     markup.add(types.KeyboardButton("📞 Telefon raqamni yuborish", request_contact=True))
     bot.send_message(chat_id, "📱 Telefon raqamingizni kiriting yoki tugmani bosing:", reply_markup=markup)
 
-@bot.message_handler(content_types=['contact', 'text'], func=lambda message: message.chat.id in user_orders and "name" in user_orders[message.chat.id] and "phone" not in user_orders[message.chat.id])
+@bot.message_handler(content_types=['contact', 'text'], func=lambda message: message.chat.id in user_orders and "name" in user_orders[message.chat.id] and "phone" not in message.chat.id])
 def get_phone(message):
     chat_id = message.chat.id
     user_orders[chat_id]["phone"] = message.contact.phone_number if message.content_type == 'contact' else message.text
     bot.send_message(chat_id, "📅 Buyurtma qaysi sana va soatga tayyor bo'lishi kerak?\n(Masalan: 8-noyabr soat 14:00 ga):", reply_markup=types.ReplyKeyboardRemove())
 
-@bot.message_handler(func=lambda message: message.chat.id in user_orders and "phone" in user_orders[message.chat.id] and "date" not in user_orders[message.chat.id])
+@bot.message_handler(func=lambda message: message.chat.id in user_orders and "phone" in user_orders[message.chat.id] and "date" not in message.chat.id])
 def get_date(message):
     chat_id = message.chat.id
     user_orders[chat_id]["date"] = message.text
     qty = user_orders[chat_id]["quantity"]
     
     if qty < 2:
-        user_orders[chat_id]["delivery"] = "O'zi olib ketadi (Samovivoz — 2 tadan kam bo'lgani uchun)"
+        user_orders[chat_id]["delivery"] = "O'zi olib ketadi (Samovivoz)"
         finish_order(chat_id)
     else:
         user_orders[chat_id]["delivery"] = "Yetkazib berish (3,000 so'm/km)"
